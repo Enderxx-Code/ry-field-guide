@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RY Guide">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1d2347">
+<meta name="description" content="Unofficial field guide to Pokémon Recharged Yellow 1.9.7.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html, body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+html { overscroll-behavior-y: none; }
+</style>
+<title>Recharged Yellow Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a Pokégear-style handheld guide. Sticky header with search, one view per tab,
+   bottom tab bar on phones (top on wide screens), detail sheets that slide over the view. */
+:root {
+  --bg: #eef0f6;
+  --surface: #ffffff;
+  --sunk: #e3e6f0;
+  --ink: #171b33;
+  --muted: #5b6283;
+  --line: #d3d7e6;
+  --gold: #9a6b0c;
+  --gold-soft: #f6e7c4;
+  --silver: #4c6a8f;
+  --night: #1d2347;
+  --good: #2f8a4c;
+  --warn: #b5671b;
+  --bad: #c03a3a;
+  --shadow: 0 1px 2px rgba(23,27,51,.06), 0 6px 20px rgba(23,27,51,.08);
+  --f-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --t-normal:#9a9c90; --t-fire:#e0592a; --t-water:#3b7fdc; --t-grass:#3f9b3a; --t-electric:#e6b417;
+  --t-ice:#4cbcd8; --t-fighting:#c4512b; --t-poison:#9147b8; --t-ground:#b3843c; --t-flying:#7e98dc;
+  --t-psychic:#e0507e; --t-bug:#8fa21c; --t-rock:#a99a5a; --t-ghost:#6a4f94; --t-dragon:#5b55d6;
+  --t-dark:#5b4a44; --t-steel:#6f98ac; --t-fairy:#d974c9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1226; --surface: #181c36; --sunk: #111430; --ink: #e8eaf6; --muted: #9aa1c4;
+    --line: #2b3157; --gold: #e7b546; --gold-soft: #3a3118; --silver: #9fb6d8; --night: #0a0c1c;
+    --good: #5cc27c; --warn: #e39a4a; --bad: #ef6b6b;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1226; --surface: #181c36; --sunk: #111430; --ink: #e8eaf6; --muted: #9aa1c4;
+  --line: #2b3157; --gold: #e7b546; --gold-soft: #3a3118; --silver: #9fb6d8; --night: #0a0c1c;
+  --good: #5cc27c; --warn: #e39a4a; --bad: #ef6b6b;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--night); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--night); color: #eef0fa; }
+.top .wrap { display: flex; align-items: center; gap: 14px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: none; }
+.brand-mark { width: 30px; height: 30px; border-radius: 50%; background: conic-gradient(#e7b546 0 50%, #c9d3e6 50% 100%); position: relative; flex: none; }
+.brand-mark::after { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--night); box-shadow: 0 0 0 2px #eef0fa inset; }
+.brand h1 { font-family: var(--f-display); font-size: 17px; font-weight: 700; letter-spacing: .02em; margin: 0; line-height: 1.1; }
+.brand small { display: block; font-family: var(--f-display); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #aab3d6; }
+.search { flex: 1; min-width: 0; position: relative; }
+.search input { width: 100%; border: 1px solid #343b6c; background: #262c58; color: #eef0fa; border-radius: 10px; padding: 9px 12px 9px 34px; font-size: 16px; }
+.search input::placeholder { color: #9aa3cc; }
+.search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: #9aa3cc; }
+.tabs { display: flex; gap: 2px; }
+.tabs a { font-family: var(--f-display); font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; color: #b8c0e3; padding: 8px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tabs a svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.tabs a[aria-current="page"] { color: #f2c75c; background: rgba(231,181,70,.12); }
+.tabbar { display: none; }
+.brand h1 .short { display: none; }
+@media (max-width: 760px) {
+  .top .tabs { display: none; }
+  .brand small { display: none; }
+  .brand h1 { font-size: 15px; }
+  .brand h1 .long { display: none; }
+  .brand h1 .short { display: inline; }
+  .tabbar { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--night); border-top: 1px solid #2b3157;
+    padding: 4px max(6px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
+  .tabbar .tabs { justify-content: space-around; }
+  .tabbar .tabs a { font-size: 10px; padding: 6px 4px; flex: 1; }
+  main { padding-bottom: 84px; }
+}
+
+/* views */
+main { padding-block: 18px 40px; }
+.view[hidden] { display: none !important; }
+.view-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.view-head h2 { font-family: var(--f-display); font-size: 26px; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.view-head p { margin: 2px 0 0; color: var(--muted); max-width: 62ch; }
+.filter { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 12px; font-size: 16px; margin-bottom: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; min-height: 32px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.label { font-family: var(--f-display); font-size: 11.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.empty { color: var(--muted); padding: 24px 4px; text-align: center; }
+.note { border-left: 3px solid var(--gold); background: var(--gold-soft); padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 14px; margin: 0 0 14px; }
+
+/* sprites */
+.spr { display: inline-block; flex: none; background-repeat: no-repeat; image-rendering: pixelated; }
+/* type chips */
+.type { display: inline-flex; align-items: center; font-family: var(--f-display); font-weight: 600; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #fff; padding: 1px 8px; border-radius: 5px; line-height: 18px; text-shadow: 0 1px 0 rgba(0,0,0,.25); white-space: nowrap; }
+.types { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.mv { font-weight: 500; border-bottom: 2px solid var(--tc, var(--line)); }
+.mvbtn { background: none; border: 0; padding: 0; text-align: left; }
+
+/* journey */
+.progress { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
+.progress .bar { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: var(--sunk); overflow: hidden; }
+.progress .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), #d9a63a); width: 0; transition: width .4s; }
+.progress b { font-family: var(--f-display); font-size: 20px; }
+.btn { border: 0; background: var(--ink); color: var(--bg); border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 14px; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.region { font-family: var(--f-display); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin: 22px 0 8px; display: flex; align-items: center; gap: 10px; }
+.region::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.stop { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 6px; content-visibility: auto; contain-intrinsic-size: auto 52px; }
+.stop > header { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; min-height: 52px; }
+.stop .num { font-family: var(--f-display); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--muted); width: 28px; flex: none; }
+.stop .ttl { flex: 1; min-width: 0; background: none; border: 0; text-align: left; padding: 0; font-weight: 600; font-size: 15px; }
+.stop .tags { display: flex; gap: 4px; flex: none; }
+.tag { font-size: 11px; font-weight: 600; border-radius: 5px; padding: 1px 6px; background: var(--sunk); color: var(--muted); white-space: nowrap; }
+.tag.gym { background: var(--gold-soft); color: var(--gold); }
+.check { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); background: transparent; flex: none; display: grid; place-items: center; padding: 0; }
+.check svg { width: 14px; height: 14px; stroke: transparent; stroke-width: 3; fill: none; }
+.stop.done .check { background: var(--good); border-color: var(--good); }
+.stop.done .check svg { stroke: #fff; }
+.stop.done .ttl { color: var(--muted); }
+.stop-body { padding: 2px 16px 16px 50px; border-top: 1px dashed var(--line); }
+.stop-body p { margin: 10px 0; max-width: 68ch; }
+.stop-body h4 { font-family: var(--f-display); font-size: 15px; margin: 18px 0 4px; color: var(--silver); }
+.panel { background: var(--sunk); border-radius: 10px; padding: 10px 12px; margin-top: 14px; }
+.panel > .label { display: block; margin-bottom: 6px; }
+@media (max-width: 760px) { .stop-body { padding-left: 14px; padding-right: 14px; } }
+
+/* encounter tables */
+.enc-loc { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; content-visibility: auto; contain-intrinsic-size: auto 200px; }
+.enc-loc h3 { margin: 0 0 6px; font-family: var(--f-display); font-size: 17px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--sunk); border-radius: 8px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 18px; }
+.method h5 { margin: 6px 0 2px; }
+.encrow { display: grid; grid-template-columns: 32px 1fr auto auto; align-items: center; gap: 0 8px; font-size: 14px; padding: 1px 0; }
+.encrow .mbtn { background: none; border: 0; padding: 0; text-align: left; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.encrow .pct { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; min-width: 3.2em; }
+.encrow .lv { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12.5px; min-width: 5.2em; text-align: right; }
+
+/* lists & cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+.card h3 { margin: 0; font-size: 16px; }
+.row-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; min-width: 0; }
+.row-btn:hover { border-color: var(--silver); }
+.row-btn .grow { flex: 1; min-width: 0; }
+.row-btn .sub { color: var(--muted); font-size: 12.5px; }
+.dexlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.dexlist .row-btn { content-visibility: auto; contain-intrinsic-size: auto 58px; }
+.dexnum { font-family: var(--f-display); font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+.more { display: block; margin: 14px auto 0; }
+
+/* trainers */
+.trainer { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+.trainer > header { display: flex; align-items: center; gap: 12px; }
+.trainer h3 { margin: 0; font-family: var(--f-display); font-size: 19px; }
+.trainer .role { color: var(--muted); font-size: 13px; }
+.party { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 10px; }
+.pmon { background: var(--sunk); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.pmon .hd { display: flex; align-items: center; gap: 6px; }
+.pmon .hd .mbtn { font-weight: 600; background: none; border: 0; padding: 0; text-align: left; }
+.pmon .lvl { margin-left: auto; font-family: var(--f-display); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pmon .meta { font-size: 12.5px; color: var(--muted); margin: 2px 0 4px; }
+.pmon ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; font-size: 13px; }
+.group-h { font-family: var(--f-display); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); margin: 22px 0 10px; }
+
+/* sheet */
+.scrim { position: fixed; inset: 0; background: rgba(8,10,24,.55); z-index: 40; opacity: 0; transition: opacity .2s; }
+.scrim.on { opacity: 1; }
+.sheet { position: fixed; z-index: 41; left: 50%; transform: translate(-50%, 0); bottom: 0; width: min(720px, 100%); max-height: calc(100% - 40px - env(safe-area-inset-top, 0px)); overflow-y: auto; background: var(--bg); border-radius: 18px 18px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,.3);
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .22s ease-out; } @keyframes up { from { transform: translate(-50%, 30px); opacity: .4; } } }
+.sheet { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+/* Unfolded and turned sideways (the big screen in landscape) or any wide screen: details dock to the
+   right as a side panel and the list stays usable beside it, instead of a sheet over everything. */
+@media (min-width: 840px) {
+  .sheet { left: auto; right: 0; top: 0; bottom: 0; transform: none; width: min(440px, 46vw); max-height: none; border-radius: 0;
+    border-left: 1px solid var(--line); box-shadow: -8px 0 30px rgba(0,0,0,.16);
+    padding-top: env(safe-area-inset-top, 0px); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .scrim { display: none; }
+  body.docked main.wrap, body.docked .top .wrap { margin-right: min(440px, 46vw); }
+  body.docked .top .tabs a { padding-inline: 7px; }
+}
+@media (min-width: 840px) and (prefers-reduced-motion: no-preference) { .sheet { animation-name: side; } @keyframes side { from { transform: translateX(28px); opacity: .4; } } }
+/* Unfolded, held upright (about 626 points wide): use the extra width for two-up lists. */
+@media (min-width: 560px) and (max-width: 839px) {
+  .grid, .dexlist { grid-template-columns: 1fr 1fr; }
+  .party { grid-template-columns: 1fr 1fr; }
+  .methods { grid-template-columns: 1fr 1fr; }
+  .sheet { width: 100%; max-height: calc(100% - 64px - env(safe-area-inset-top, 0px)); }
+}
+.sheet-top { position: sticky; top: 0; background: var(--bg); display: flex; align-items: center; gap: 8px; padding: 12px 0 8px; z-index: 1; }
+.sheet-top .grab { flex: 1; }
+.iconbtn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; padding: 0; }
+.iconbtn svg { width: 16px; height: 16px; stroke: var(--ink); stroke-width: 2; fill: none; }
+.hero { display: flex; gap: 14px; align-items: center; }
+.hero .art { background: radial-gradient(circle at 50% 60%, var(--surface), var(--sunk)); border-radius: 16px; border: 1px solid var(--line); padding: 4px; }
+.hero h2 { font-family: var(--f-display); font-size: 26px; margin: 0; line-height: 1.1; }
+.formpills { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 0; }
+.sec { margin-top: 18px; }
+.sec > .label { display: block; margin-bottom: 6px; }
+.stats { display: grid; grid-template-columns: 44px 36px 1fr; gap: 4px 8px; align-items: center; font-size: 13px; }
+.stats .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+.stats .b { height: 8px; border-radius: 99px; background: var(--sunk); overflow: hidden; }
+.stats .b i { display: block; height: 100%; border-radius: 99px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+.eff { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.eff .x { font-family: var(--f-display); font-weight: 700; font-size: 12px; color: var(--muted); margin-left: 2px; }
+.mlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 3px 12px; font-size: 14px; }
+.lvlist { display: grid; grid-template-columns: 34px 1fr; gap: 3px 8px; font-size: 14px; }
+.lvlist .l { font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+.tabs2 { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 18px; overflow-x: auto; }
+.tabs2 button { border: 0; background: none; padding: 8px 10px; font-weight: 600; font-size: 13.5px; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs2 button[aria-selected="true"] { color: var(--ink); border-color: var(--gold); }
+.wherelist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.wherelist li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.wherelist .h { color: var(--muted); font-size: 13px; }
+.evo { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.evo .mbtn { display: flex; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 2px 10px 2px 2px; }
+.mvinfo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 10px; }
+
+/* type chart */
+.tchart-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.tchart { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 12px; }
+.tchart th, .tchart td { width: 30px; height: 28px; text-align: center; padding: 0; }
+.tchart th.r { text-align: right; padding-right: 6px; white-space: nowrap; width: auto; }
+.tchart thead th { height: 74px; vertical-align: bottom; }
+.tchart thead th span { writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; padding: 3px 0; }
+.tchart td.x2 { background: color-mix(in srgb, var(--good) 30%, transparent); font-weight: 700; }
+.tchart td.x05 { background: color-mix(in srgb, var(--bad) 22%, transparent); }
+.tchart td.x0 { background: var(--ink); color: var(--bg); font-weight: 700; }
+.tchart tr:hover td, .tchart td:hover { outline: 1px solid var(--silver); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+.legend .a::before { background: color-mix(in srgb, var(--good) 30%, transparent); }
+.legend .b::before { background: color-mix(in srgb, var(--bad) 22%, transparent); }
+.legend .c::before { background: var(--ink); }
+.faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; }
+.faq summary { font-weight: 600; cursor: pointer; }
+.faq summary .tag { margin-right: 6px; }
+.faq p { margin: 8px 0 0; }
+.features ul { margin: 6px 0 0; padding-left: 18px; }
+.features li { margin: 3px 0; }
+.shinies { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.shinies .card { text-align: center; padding: 10px; }
+.shinies .pair { display: flex; justify-content: center; gap: 4px; }
+.shinies figure { margin: 0; font-size: 11px; color: var(--muted); }
+.loading { display: grid; place-items: center; gap: 12px; padding: 80px 0; color: var(--muted); }
+.loading .ball { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--gold) 0 50%, var(--line) 50% 100%); }
+@media (prefers-reduced-motion: no-preference) { .loading .ball { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } } }
+footer.site { color: var(--muted); font-size: 12.5px; padding-block: 10px 30px; }
+footer.site a { color: inherit; }
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><h1><span class="long">Recharged Yellow Field Guide</span><span class="short">RY Guide</span></h1><small>Version 2.0.6</small></div></div>
+    <label class="search"><span class="sr" hidden>Search everything</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search Pokémon, moves, items, places…" autocomplete="off" aria-label="Search everything">
+    </label>
+    <nav class="tabs" aria-label="Sections" id="tabsTop"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="loading" id="loading"><span class="ball" aria-hidden="true"></span><span>Loading the guide…</span></div>
+
+  <section class="view" id="v-search" hidden></section>
+
+  <section class="view" id="v-journey" hidden>
+    <div class="view-head"><div><h2>Journey</h2><p>The walkthrough, stop by stop. Each stop shows the wild Pokémon and big battles there in 2.0.6. Tick stops off as you go.</p></div></div>
+    <p class="note">The walkthrough text was written for an earlier version of Heart &amp; Soul. Its directions still hold, but the wild Pokémon, trainer teams and items shown under each stop come from 2.0.6, so trust those where the two disagree.</p>
+    <div class="progress"><div><span class="label">Progress</span><div><b id="pDone">0</b> <span id="pOf"></span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="contBtn" type="button">Continue</button></div><div class="bar"><i id="pBar"></i></div></div>
+    <input class="filter" id="jFilter" type="search" placeholder="Find a stop (Goldenrod, Surf, Lugia…)" aria-label="Find a stop">
+    <div id="jList"></div>
+  </section>
+
+  <section class="view" id="v-wild" hidden>
+    <div class="view-head"><div><h2>Wild Pokémon</h2><p>Every place with wild encounters, with rates and levels from 2.0.6. Search a place or a Pokémon.</p></div></div>
+    <input class="filter" id="wFilter" type="search" placeholder="Route 34, Ice Path, Larvitar…" aria-label="Filter wild encounters">
+    <div id="wList"></div>
+  </section>
+
+  <section class="view" id="v-trainers" hidden>
+    <div class="view-head"><div><h2>Big battles</h2><p>Gym Leaders, the Elite Four, your rival and other major fights, with full teams. Battles you face more than once have a button for each.</p></div></div>
+    <input class="filter" id="tFilter" type="search" placeholder="Whitney, Rival, Red…" aria-label="Filter trainers">
+    <div id="tList"></div>
+  </section>
+
+  <section class="view" id="v-dex" hidden>
+    <div class="view-head"><div><h2>Pokédex</h2><p>Every species in the game, with stats, abilities, evolutions, learnsets and where to find it.</p></div></div>
+    <input class="filter" id="dFilter" type="search" placeholder="Name, ability or move…" aria-label="Filter Pokédex">
+    <div class="chips" id="dTypes"></div>
+    <div class="dexlist" id="dList"></div>
+    <button class="btn ghost more" id="dMore" type="button" hidden>Show more</button>
+  </section>
+
+  <section class="view" id="v-items" hidden>
+    <div class="view-head"><div><h2>Items &amp; TMs</h2><p>Where every item is found: item balls, hidden items, gifts, shops and prizes.</p></div></div>
+    <input class="filter" id="iFilter" type="search" placeholder="Leftovers, TM26, Ilex Forest…" aria-label="Filter items">
+    <div class="chips" id="iCats"></div>
+    <div class="grid" id="iList"></div>
+    <button class="btn ghost more" id="iMore" type="button" hidden>Show more</button>
+  </section>
+
+  <section class="view" id="v-more" hidden>
+    <div class="view-head"><div><h2>More</h2><p>Gifts and legendaries, the type chart, unique shinies, breeding, completion and the FAQ.</p></div></div>
+    <div class="chips" id="mTabs"></div>
+    <div id="mBody"></div>
+  </section>
+
+  <footer class="site">Unofficial guide built from the <a href="https://pokemonhns-development.github.io/pokehns-expansion-documentation/index.html" target="_blank" rel="noopener">official Heart &amp; Soul documentation</a> (build of 3 October 2026). Heart &amp; Soul is made by the <a href="https://github.com/PokemonHnS-Development/pokehns-expansion" target="_blank" rel="noopener">Heart &amp; Soul team</a>. Progress ticks are saved in this browser only.</footer>
+</main>
+
+<nav class="tabbar" aria-label="Sections"><div class="tabs" id="tabsBottom"></div></nav>
+<div id="sheetHost"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let PREFIX = "hns:";   // per guide, so each keeps its own ticks (set from data.meta.key)
+const norm = s => String(s || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/['’.]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(PREFIX + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch {} }
+};
+
+const TABS = [
+  ["journey", "Journey", '<path d="M4 19c4-1 4-6 8-6s4 5 8 6"/><circle cx="12" cy="6" r="3"/>'],
+  ["wild", "Wild", '<path d="M5 20c0-6 3-11 7-15 4 4 7 9 7 15"/><path d="M12 5v15"/>'],
+  ["trainers", "Battles", '<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><circle cx="12" cy="12" r="2.5"/>'],
+  ["dex", "Pokédex", '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/>'],
+  ["items", "Items", '<path d="M6 8h12l-1 12H7z"/><path d="M9 8a3 3 0 0 1 6 0"/>'],
+  ["more", "More", '<circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/>']
+];
+const tabHtml = TABS.map(([id, n, ic]) => `<a href="#${id}" data-tab="${id}"><svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>${n}</a>`).join("");
+$("#tabsTop").innerHTML = tabHtml; $("#tabsBottom").innerHTML = tabHtml;
+
+let D, A, dexByName = new Map(), dexBySlug = new Map();
+
+/* ---------- sprites ---------- */
+function spr(sheet, key, px) {
+  const a = A[sheet]; if (!a || key == null) return `<span class="spr" style="width:${px}px;height:${px}px"></span>`;
+  const i = a.index[key]; if (i == null) return `<span class="spr" style="width:${px}px;height:${px}px"></span>`;
+  const k = px / a.size, x = (i % a.cols) * px, y = Math.floor(i / a.cols) * px;
+  return `<span class="spr" aria-hidden="true" style="width:${px}px;height:${px}px;background-image:url(${sheet}.png);background-size:${a.w * k}px ${a.h * k}px;background-position:-${x}px -${y}px"></span>`;
+}
+const iconFor = name => { const e = dexByName.get(norm(name)); return e ? e.icon : null; };
+const tcol = t => `var(--t-${norm(t).replace(/ /g, "")}, var(--muted))`;
+const typeChip = t => `<span class="type" style="background:${tcol(t)}">${esc(t)}</span>`;
+const monBtn = (name, icon, px = 32) => `<button class="mbtn" type="button" data-mon="${esc(name)}">${px ? "" : ""}${esc(name)}</button>`;
+function moveLink(name) {
+  const m = D.moves[name];
+  return `<button class="mvbtn" type="button" data-move="${esc(name)}"><span class="mv" style="--tc:${m ? tcol(m.type) : "var(--line)"}">${esc(name)}</span></button>`;
+}
+
+/* ---------- type maths ---------- */
+let TYPES, CHART;
+const mult = v => v === "2" ? 2 : v === "½" ? 0.5 : v === "0" ? 0 : 1;
+function defense(types) {
+  const out = {};
+  for (const atk of TYPES) {
+    let m = 1;
+    for (const t of types) { const j = TYPES.indexOf(t); if (j >= 0) m *= mult(CHART[atk][j]); }
+    out[atk] = m;
+  }
+  return out;
+}
+
+/* ---------- journey ---------- */
+const GYMS = { "violet city gym": "Falkner", "azalea town gym": "Bugsy", "goldenrod city gym": "Whitney", "ecruteak city gym": "Morty",
+  "cianwood city gym": "Chuck", "olivine city gym": "Jasmine", "mahogany town gym": "Pryce", "blackthorn city gym": "Clair",
+  "vermilion city gym": "Lt. Surge", "saffron city gym": "Sabrina", "celadon city gym": "Erika", "fuchsia city gym": "Janine",
+  "cerulean city gym": "Misty", "pewter city gym": "Brock", "cinnabar gym": "Blaine", "viridian city gym": "Blue" };
+let STOPS = [];
+function buildStops() {
+  const stops = [];
+  const M = D.meta || {};
+  for (const s of D.wt) {
+    if (!M.noMerge && !s.p.length && stops.length) {
+      const last = stops[stops.length - 1];
+      if (s.title.length > 90) last.body.push({ p: s.title }); else last.body.push({ h: s.title });
+      last.search += " " + norm(s.title);
+      continue;
+    }
+    stops.push({ id: s.id, title: s.title, region: s.region, body: s.p.map(p => ({ p })), search: norm(s.title + " " + s.p.join(" ")) });
+  }
+  let region = "Johto";
+  stops.forEach((s, i) => {
+    const t = s.title.toLowerCase();
+    if (t.startsWith("new bark town/elm (s.s. ticket)")) region = "Kanto";
+    if (t.startsWith("kanto safari zone steven")) region = "Postgame";
+    s.region = s.region || region; s.n = i + 1;
+    s.enc = encFor(s.title);
+    s.trainers = trainersFor(s.title);
+    s.items = itemsFor(s.title);
+  });
+  STOPS = stops;
+}
+function placeKeys(title) {
+  const keys = [];
+  for (let part of title.split("/")) {
+    const q = (part.match(/\(([^)]*)\)/) || [])[1] || "";
+    part = part.replace(/\([^)]*\)/g, " ");
+    let k = norm(part).replace(/\b(revisited|final visit|finished|outside)\b/g, "").trim();
+    if (!k) continue;
+    keys.push({ k, q: norm(q) });
+    const k2 = k.replace(/\b(east|west|north|south)$/, "").trim();
+    if (k2 !== k) keys.push({ k: k2, q: k.slice(k2.length).trim() });
+  }
+  return keys;
+}
+function locMatch(locName, key) {
+  const lw = norm(locName).split(" "), kw = key.split(" ");
+  if (kw.every((w, i) => lw[i] === w)) return true;
+  return norm(locName).replace(/ /g, "") === key.replace(/ /g, "");
+}
+function encFor(title) {
+  const keys = placeKeys(title), hits = new Set();
+  for (const { k, q } of keys) {
+    let m = D.enc.filter(e => locMatch(e.loc, k));
+    if (q) { const mq = m.filter(e => norm(e.loc).includes(q)); if (mq.length) m = mq; }
+    m.forEach(e => hits.add(e));
+    if (m.length) break;
+  }
+  return [...hits];
+}
+function trainersFor(title) {
+  const t = title.toLowerCase(), out = [];
+  const add = pred => D.trainers.forEach((tr, i) => { if (pred(tr) && !out.includes(i)) out.push(i); });
+  for (const [g, name] of Object.entries(GYMS)) if (t.includes(g)) add(tr => tr.name === name && /Leader/.test(tr.role));
+  if (/rival battle/.test(t)) add(tr => tr.group === "Rival");
+  if (/elite 4/.test(t)) add(tr => tr.group === "Elite Four" || tr.group === "Champion");
+  if (/rocket|radio tower|mahogany rocket/.test(t) && !/lavender/.test(t)) add(tr => tr.group === "Team Rocket Executives" && tr.name !== "Giovanni");
+  if (/rocket hideout|silph co/.test(t)) add(tr => tr.group === "Team Rocket");
+  if (/giovanni/.test(t)) add(tr => tr.name === "Giovanni");
+  if (/kimono/.test(t)) add(tr => tr.group === "Kimono Girls");
+  if (/steven/.test(t) && /silph/.test(t)) add(tr => tr.name === "Steven");
+  if (/mt\. silver|unlocking mt/.test(t)) add(tr => tr.name === "Red");
+  return out;
+}
+function itemsFor(title) {
+  const keys = placeKeys(title), out = [];
+  if (!keys.length) return out;
+  for (const it of D.items) for (const [w, h] of it.where) {
+    if (!w || /shop|bp|prize|streak|place/i.test(h)) continue;
+    if (keys.some(({ k }) => locMatch(w, k))) out.push([it, w, h]);
+  }
+  return out;
+}
+
+function renderJourney() {
+  const done = new Set(store.get("done", []));
+  const f = norm($("#jFilter").value);
+  let html = "", region = "";
+  for (const s of STOPS) {
+    if (f && !s.search.includes(f)) continue;
+    if (s.region !== region) { region = s.region; html += `<div class="region">${esc(region)}</div>`; }
+    const tags = [];
+    if (s.trainers.some(i => /Leader/.test(D.trainers[i].role))) tags.push('<span class="tag gym">Gym</span>');
+    else if (s.trainers.length) tags.push('<span class="tag gym">Battle</span>');
+    if (s.enc.length) tags.push('<span class="tag">Wild</span>');
+    html += `<article class="stop${done.has(s.id) ? " done" : ""}" id="stop-${esc(s.id)}" data-id="${esc(s.id)}">
+      <header><span class="num">${s.n}</span><button class="ttl" type="button" aria-expanded="false">${esc(s.title)}</button><span class="tags">${tags.join("")}</span>
+      <button class="check" type="button" aria-label="Mark ${esc(s.title)} done" aria-pressed="${done.has(s.id)}"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></button></header></article>`;
+  }
+  $("#jList").innerHTML = html || `<p class="empty">No stop matches “${esc($("#jFilter").value)}”.</p>`;
+  updateProgress();
+}
+function stopBody(s) {
+  let h = '<div class="stop-body">';
+  for (const b of s.body) h += b.h ? `<h4>${esc(b.h)}</h4>` : `<p>${esc(b.p).replace(/\n/g, "<br>")}</p>`;
+  if (s.trainers.length) {
+    h += `<div class="panel"><span class="label">Big battles here</span><div style="display:grid;gap:6px">`;
+    for (const i of s.trainers) h += trainerRow(i);
+    h += `</div></div>`;
+  }
+  if (s.enc.length) {
+    h += `<div class="panel"><span class="label">Wild Pokémon here in 2.0.6</span>`;
+    for (const e of s.enc) h += encBlock(e, true);
+    h += `</div>`;
+  }
+  if (s.items.length) {
+    h += `<div class="panel"><span class="label">Items found here</span><ul class="wherelist">`;
+    for (const [it, w, how] of s.items) h += `<li><button class="mvbtn" type="button" data-item="${esc(it.name)}" style="display:flex;align-items:center;gap:6px">${spr("item", it.icon, 24)}<b>${esc(it.name)}</b></button><span class="h">${esc(w)} · ${esc(how)}</span></li>`;
+    h += `</ul></div>`;
+  }
+  return h + "</div>";
+}
+function toggleStop(art, open) {
+  const btn = $(".ttl", art), body = $(".stop-body", art);
+  const isOpen = !!body;
+  if (open === undefined) open = !isOpen;
+  if (open && !isOpen) { const s = STOPS.find(x => x.id === art.dataset.id); art.insertAdjacentHTML("beforeend", stopBody(s)); }
+  if (!open && isOpen) body.remove();
+  btn.setAttribute("aria-expanded", open);
+}
+function updateProgress() {
+  const done = new Set(store.get("done", []));
+  const n = STOPS.filter(s => done.has(s.id)).length;
+  $("#pDone").textContent = n; $("#pOf").textContent = `of ${STOPS.length} stops`;
+  $("#pBar").style.width = (100 * n / STOPS.length) + "%";
+  const next = STOPS.find(s => !done.has(s.id));
+  $("#contBtn").textContent = next ? (n ? `Continue: ${next.title}` : `Start: ${next.title}`) : "All done";
+  $("#contBtn").disabled = !next;
+}
+$("#jList").addEventListener("click", e => {
+  const art = e.target.closest(".stop"); if (!art) return;
+  if (e.target.closest(".check")) {
+    const done = new Set(store.get("done", [])); const id = art.dataset.id;
+    done.has(id) ? done.delete(id) : done.add(id);
+    store.set("done", [...done]);
+    art.classList.toggle("done", done.has(id)); $(".check", art).setAttribute("aria-pressed", done.has(id));
+    updateProgress(); return;
+  }
+  if (e.target.closest(".ttl")) toggleStop(art);
+});
+$("#jFilter").addEventListener("input", renderJourney);
+$("#contBtn").addEventListener("click", () => {
+  const done = new Set(store.get("done", [])); const next = STOPS.find(s => !done.has(s.id)); if (!next) return;
+  $("#jFilter").value = ""; renderJourney();
+  const art = document.getElementById("stop-" + next.id); toggleStop(art, true);
+  art.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+});
+
+/* ---------- wild ---------- */
+function encBlock(e, compact) {
+  const times = e.times.filter(t => t.methods.length);
+  const hasTimes = times.length > 1;
+  const id = "e" + D.enc.indexOf(e) + (compact ? "c" : "");
+  const pick = hasTimes ? (new Date().getHours() >= 6 && new Date().getHours() < 18 ? 0 : 1) : 0;
+  let h = `<div class="enc-loc" data-enc="${id}"><h3><span>${esc(e.loc)}</span>`;
+  if (hasTimes) h += `<span class="seg">${times.map((t, i) => `<button type="button" data-time="${i}" aria-pressed="${i === pick}">${esc(t.t)}</button>`).join("")}</span>`;
+  h += `</h3>`;
+  times.forEach((t, i) => {
+    h += `<div class="methods" data-tblock="${i}"${i === pick ? "" : " hidden"}>`;
+    for (const m of t.methods) {
+      h += `<div class="method"><h5 class="label">${esc(m.m)}</h5>`;
+      for (const [mon, icon, pct, lv] of m.list) h += `<div class="encrow">${spr("icon", icon, 32)}<button class="mbtn" type="button" data-mon="${esc(mon)}">${esc(mon)}</button><span class="pct">${esc(pct)}</span><span class="lv">${esc(lv)}</span></div>`;
+      h += `</div>`;
+    }
+    h += `</div>`;
+  });
+  return h + "</div>";
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".seg button"); if (!b) return;
+  const box = b.closest(".enc-loc");
+  box.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  box.querySelectorAll("[data-tblock]").forEach(x => x.hidden = x.dataset.tblock !== b.dataset.time);
+});
+function renderWild() {
+  const f = norm($("#wFilter").value);
+  const list = D.enc.filter(e => !f || norm(e.loc).includes(f) || e.times.some(t => t.methods.some(m => m.list.some(r => norm(r[0]).includes(f)))));
+  $("#wList").innerHTML = list.map(e => encBlock(e)).join("") || `<p class="empty">Nothing found for “${esc($("#wFilter").value)}”.</p>`;
+}
+$("#wFilter").addEventListener("input", renderWild);
+
+/* ---------- trainers ---------- */
+function trainerLabel(tr) {
+  if (tr.group === "Rival") { const b = tr.battles[0]; const s = b && b.party[b.party.length - 1]; return `Rival · with ${s ? s.mon : "?"}`; }
+  return tr.name;
+}
+function trainerRow(i) {
+  const tr = D.trainers[i];
+  return `<button class="row-btn" type="button" data-trainer="${i}">${spr("trainer", tr.pic, 40)}<span class="grow"><b>${esc(trainerLabel(tr))}</b><div class="sub">${esc(tr.role)}${tr.battles.length > 1 ? " · " + tr.battles.length + " battles" : ""}</div></span></button>`;
+}
+function partyHtml(b) {
+  let h = "";
+  if (b.notes.length) h += `<p class="sub" style="margin:8px 0 0;color:var(--muted);font-size:13px">${b.notes.map(esc).join(" · ")}</p>`;
+  h += `<div class="party">`;
+  for (const p of b.party) h += `<div class="pmon"><div class="hd">${spr("icon", p.icon, 32)}<button class="mbtn" type="button" data-mon="${esc(p.mon)}">${esc(p.mon)}</button><span class="lvl">Lv ${esc(p.lv)}</span></div>
+    <div class="meta">${p.item && p.item !== "None" ? esc(p.item) + " · " : ""}${p.ab ? `<button class="mvbtn" type="button" data-ability="${esc(p.ab)}">${esc(p.ab)}</button>` : ""}</div>
+    <ul>${p.moves.map(m => `<li>${moveLink(m)}</li>`).join("")}</ul></div>`;
+  return h + `</div>`;
+}
+function trainerCard(i) {
+  const tr = D.trainers[i];
+  const pills = tr.battles.length > 1 ? `<div class="chips" style="margin:10px 0 0">${tr.battles.map((b, j) => `<button class="chip" type="button" data-battle="${j}" aria-pressed="${j === 0}">${esc(b.label || "Battle " + (j + 1))}</button>`).join("")}</div>` : "";
+  return `<article class="trainer" data-ti="${i}"><header>${spr("trainer", tr.pic, 64)}<div><h3>${esc(trainerLabel(tr))}</h3><div class="role">${esc(tr.role)}${tr.battles[0] && tr.battles[0].label && tr.battles.length === 1 ? " · " + esc(tr.battles[0].label) : ""}</div></div></header>${pills}<div class="bt">${tr.battles[0] ? partyHtml(tr.battles[0]) : ""}</div></article>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-battle]"); if (!b) return;
+  const card = b.closest(".trainer"), tr = D.trainers[+card.dataset.ti];
+  card.querySelectorAll("[data-battle]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $(".bt", card).innerHTML = partyHtml(tr.battles[+b.dataset.battle]);
+});
+function renderTrainers() {
+  const f = norm($("#tFilter").value);
+  let h = "", g = "";
+  D.trainers.forEach((tr, i) => {
+    const hay = norm([tr.name, tr.group, tr.role, trainerLabel(tr), ...tr.battles.flatMap(b => b.party.map(p => p.mon))].join(" "));
+    if (f && !hay.includes(f)) return;
+    if (tr.group !== g) { g = tr.group; h += `<div class="group-h">${esc(g)}</div>`; }
+    h += trainerCard(i);
+  });
+  $("#tList").innerHTML = h || `<p class="empty">No trainer matches “${esc($("#tFilter").value)}”.</p>`;
+}
+$("#tFilter").addEventListener("input", renderTrainers);
+
+/* ---------- dex ---------- */
+let dexType = "", dexShown = 120;
+function dexMatches() {
+  const f = norm($("#dFilter").value);
+  return D.dex.filter(e => {
+    if (dexType && !e.forms.some(fm => fm.types.includes(dexType))) return false;
+    if (!f) return true;
+    return e._s.includes(f);
+  });
+}
+function renderDex(reset) {
+  if (reset) dexShown = 120;
+  const list = dexMatches();
+  $("#dList").innerHTML = list.slice(0, dexShown).map(e => {
+    const f = e.forms[0];
+    return `<button class="row-btn" type="button" data-mon="${esc(e.name)}">${spr("icon", e.icon, 40)}<span class="grow"><span class="dexnum">#${esc(e.num)}</span> <b>${esc(e.name)}</b><div class="types">${f.types.map(typeChip).join("")}</div></span></button>`;
+  }).join("") || `<p class="empty">No Pokémon matches.</p>`;
+  $("#dMore").hidden = list.length <= dexShown;
+  $("#dMore").textContent = `Show more (${list.length - dexShown} left)`;
+}
+$("#dFilter").addEventListener("input", () => renderDex(true));
+$("#dMore").addEventListener("click", () => { dexShown += 240; renderDex(); });
+$("#dTypes").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  dexType = dexType === b.dataset.type ? "" : b.dataset.type;
+  $("#dTypes").querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x.dataset.type === dexType));
+  renderDex(true);
+});
+
+function statColor(v) { return v >= 120 ? "var(--good)" : v >= 80 ? "color-mix(in srgb, var(--good) 60%, var(--warn))" : v >= 55 ? "var(--warn)" : "var(--bad)"; }
+function monSheet(name, formIdx = 0, tab = "lv", replace = false) {
+  const e = dexByName.get(norm(name)); if (!e) return;
+  const f = e.forms[formIdx] || e.forms[0];
+  const labels = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
+  const total = (f.stats || []).reduce((a, b) => a + b, 0);
+  let h = `<div class="hero"><div class="art">${spr("mon", f.mon || e.icon, 112)}</div><div><span class="dexnum">#${esc(e.num)}</span><h2>${esc(f.name)}</h2><div class="types" style="margin-top:6px">${f.types.map(typeChip).join("")}</div></div></div>`;
+  if (e.forms.length > 1) h += `<div class="formpills">${e.forms.map((fm, i) => `<button class="chip" type="button" data-form="${i}" aria-pressed="${i === formIdx}">${esc(fm.name)}</button>`).join("")}</div>`;
+  if (f.stats && f.stats.length) {
+    h += `<div class="sec"><span class="label">Base stats · total ${total}</span><div class="stats">`;
+    f.stats.forEach((v, i) => h += `<span>${labels[i]}</span><span class="v">${v}</span><span class="b"><i style="width:${Math.min(100, v / 1.8)}%;background:${statColor(v)}"></i></span>`);
+    h += `</div></div>`;
+  }
+  h += `<div class="sec"><span class="label">Abilities</span><div class="eff">${(f.ab || []).map(a => `<button class="chip" type="button" data-ability="${esc(a)}">${esc(a)}</button>`).join("")}${f.ha && f.ha !== "None" ? `<button class="chip" type="button" data-ability="${esc(f.ha)}">${esc(f.ha)} <span style="opacity:.7">(hidden)</span></button>` : ""}</div><div id="abInfo"></div></div>`;
+  const d = defense(f.types);
+  const grp = x => TYPES.filter(t => d[t] === x);
+  const row = (lbl, arr, x) => arr.length ? `<div class="eff" style="margin:4px 0"><span class="label" style="min-width:72px">${lbl}</span>${arr.map(t => typeChip(t)).join("")}${x ? `<span class="x">${x}</span>` : ""}</div>` : "";
+  h += `<div class="sec"><span class="label">Takes damage</span>${row("4× weak", grp(4))}${row("2× weak", grp(2))}${row("½ resist", grp(0.5))}${row("¼ resist", grp(0.25))}${row("Immune", grp(0))}</div>`;
+  if (f.evo && f.evo.length) {
+    h += `<div class="sec"><span class="label">Evolution</span><div style="display:grid;gap:6px">`;
+    for (const [k, to, how] of f.evo) h += `<div class="evo"><span class="sub" style="color:var(--muted);font-size:13px;min-width:92px">${esc(k)}</span><button class="mbtn" type="button" data-mon="${esc(to)}">${spr("icon", iconFor(to), 32)}${esc(to)}</button><span style="font-size:13.5px">${esc(how)}</span></div>`;
+    h += `</div></div>`;
+  }
+  const where = [...(f.wild || []).map(w => [...w, "wild"]), ...(f.gift || []).map(w => [...w, "gift"])];
+  h += `<div class="sec"><span class="label">Where to find it</span>${where.length ? `<ul class="wherelist">${where.map(([w, how, k]) => `<li><span>${k === "gift" ? '<span class="tag">Gift</span> ' : ""}${esc(w)}</span><span class="h">${esc(how)}</span></li>`).join("")}</ul>` : `<p class="sub" style="color:var(--muted);margin:0">Not found in the wild. Evolve it, breed it or trade for it.</p>`}</div>`;
+  if (f.dexText) h += `<div class="sec"><span class="label">Pokédex entry</span><p style="margin:0;max-width:62ch">${esc(f.dexText)}</p></div>`;
+  if (f.info) h += `<div class="sec"><span class="label">Details</span><dl class="kv">${Object.entries(f.info).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div>`;
+  const mt = [["lv", "Level up", f.lv], ["tm", "TM / HM", f.tm], ["tutor", "Tutor", f.tutor], ["egg", "Egg moves", f.egg]].filter(x => x[2] && x[2].length);
+  if (mt.length) {
+    if (!mt.some(x => x[0] === tab)) tab = mt[0][0];
+    h += `<div class="tabs2" role="tablist">${mt.map(([k, n]) => `<button type="button" role="tab" data-mtab="${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div><div id="mvInfo"></div><div style="margin-top:10px">`;
+    for (const [k, , list] of mt) {
+      h += `<div data-mpanel="${k}"${k === tab ? "" : " hidden"}>`;
+      h += k === "lv" ? `<div class="lvlist">${list.map(([l, m]) => `<span class="l">${esc(l)}</span>${moveLink(m)}`).join("")}</div>` : `<div class="mlist">${list.map(m => `<span>${moveLink(m)}</span>`).join("")}</div>`;
+      h += `</div>`;
+    }
+    h += `</div>`;
+  }
+  openSheet(h, sh => {
+    sh.addEventListener("click", ev => {
+      const fb = ev.target.closest("[data-form]"); if (fb) { monSheet(name, +fb.dataset.form, tab, true); return; }
+      const tb = ev.target.closest("[data-mtab]");
+      if (tb) { tab = tb.dataset.mtab; sh.querySelectorAll("[data-mtab]").forEach(x => x.setAttribute("aria-selected", x === tb)); sh.querySelectorAll("[data-mpanel]").forEach(x => x.hidden = x.dataset.mpanel !== tab); }
+    });
+  }, replace);
+}
+
+/* ---------- move / ability / item popovers ---------- */
+function moveInfo(name) {
+  const m = D.moves[name]; if (!m) return `<div class="mvinfo"><b>${esc(name)}</b></div>`;
+  return `<div class="mvinfo"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:16px">${esc(name)}</b>${typeChip(m.type)}<span class="tag">${esc(m.cat)}</span></div>
+    <dl class="kv" style="margin-top:8px"><dt>Power</dt><dd>${esc(m.pow || "—")}</dd><dt>Accuracy</dt><dd>${esc(m.acc || "—")}</dd><dt>PP</dt><dd>${esc(m.pp)}</dd></dl><p style="margin:8px 0 0">${esc(m.desc)}</p></div>`;
+}
+function abilityInfo(name) { return `<div class="mvinfo"><b>${esc(name)}</b><p style="margin:6px 0 0">${esc(D.abilities[name] || "No description in the docs.")}</p></div>`; }
+function itemSheet(name) {
+  const it = D.items.find(i => i.name === name); if (!it) return;
+  openSheet(`<div class="hero"><div class="art">${spr("item", it.icon, 72)}</div><div><h2>${esc(it.name)}</h2><div class="eff" style="margin-top:6px">${it.badges.map(b => `<span class="tag">${esc(b)}</span>`).join("")}</div></div></div>
+    <p>${esc(it.desc)}</p><div class="sec"><span class="label">Where to find it</span><ul class="wherelist">${it.where.filter(w => w[0]).map(([w, h]) => `<li><span>${esc(w)}</span><span class="h">${esc(h)}</span></li>`).join("") || "<li>Not listed.</li>"}</ul></div>`);
+}
+function trainerSheet(i) { openSheet(trainerCard(i)); }
+
+/* ---------- sheet plumbing ---------- */
+let sheetStack = [];
+function openSheet(html, wire, replaceTop) {
+  const host = $("#sheetHost");
+  if (replaceTop && sheetStack.length) { sheetStack.pop().remove(); }
+  if (!sheetStack.length) host.insertAdjacentHTML("beforeend", '<div class="scrim"></div>');
+  const sh = document.createElement("div");
+  sh.className = "sheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
+  sh.innerHTML = `<div class="sheet-top"><span class="grab"></span>${sheetStack.length ? '<button class="iconbtn" type="button" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' : ""}<button class="iconbtn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>` + html;
+  sheetStack.forEach(s => s.hidden = true);
+  host.appendChild(sh); sheetStack.push(sh);
+  document.body.classList.toggle("docked", docked());
+  requestAnimationFrame(() => $(".scrim", host) && $(".scrim", host).classList.add("on"));
+  if (wire) wire(sh);
+  $("[data-close]", sh).focus({ preventScroll: true });
+}
+function closeTop() {
+  const sh = sheetStack.pop(); if (sh) sh.remove();
+  if (sheetStack.length) sheetStack[sheetStack.length - 1].hidden = false;
+  else { const s = $("#sheetHost .scrim"); if (s) s.remove(); document.body.classList.remove("docked"); }
+}
+const dockMQ = matchMedia("(min-width: 840px)");
+function docked() { return dockMQ.matches; }
+const redock = () => document.body.classList.toggle("docked", docked() && sheetStack.length > 0);
+dockMQ.addEventListener ? dockMQ.addEventListener("change", redock) : dockMQ.addListener(redock);
+function closeAll() { while (sheetStack.length) closeTop(); }
+document.addEventListener("keydown", e => { if (e.key === "Escape" && sheetStack.length) closeTop(); });
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-close]") || e.target.classList.contains("scrim")) { closeAll(); return; }
+  if (e.target.closest("[data-back]")) { closeTop(); return; }
+  // With the side panel docked, a tap in the list replaces what the panel shows instead of stacking on it.
+  if (docked() && sheetStack.length && !e.target.closest(".sheet") && e.target.closest("[data-mon],[data-move],[data-ability],[data-item],[data-trainer]")) closeAll();
+  const mon = e.target.closest("[data-mon]");
+  if (mon) { monSheet(mon.dataset.mon); return; }
+  const mv = e.target.closest("[data-move]");
+  if (mv) { const sh = mv.closest(".sheet"); const box = sh && $("#mvInfo", sh); if (box) { box.innerHTML = moveInfo(mv.dataset.move); box.scrollIntoView({ block: "nearest" }); } else openSheet(moveInfo(mv.dataset.move)); return; }
+  const ab = e.target.closest("[data-ability]");
+  if (ab) { const sh = ab.closest(".sheet"); const box = sh && $("#abInfo", sh); if (box) box.innerHTML = abilityInfo(ab.dataset.ability); else openSheet(abilityInfo(ab.dataset.ability)); return; }
+  const it = e.target.closest("[data-item]"); if (it) { itemSheet(it.dataset.item); return; }
+  const tr = e.target.closest("[data-trainer]"); if (tr) { trainerSheet(+tr.dataset.trainer); return; }
+});
+
+/* ---------- items ---------- */
+const ICATS = ["Poke Balls", "Medicine", "Battle Items", "Berries", "TM/HM", "Key Items", "Treasures", "Items"];
+let iCat = "", iShown = 90;
+function renderItems(reset) {
+  if (reset) iShown = 90;
+  const f = norm($("#iFilter").value);
+  const list = D.items.filter(it => (!iCat || it.badges.includes(iCat)) && (!f || it._s.includes(f)));
+  $("#iList").innerHTML = list.slice(0, iShown).map(it => {
+    const wh = it.where.filter(w => w[0]);
+    return `<button class="row-btn" type="button" data-item="${esc(it.name)}" style="align-items:flex-start">${spr("item", it.icon, 36)}<span class="grow"><b>${esc(it.name)}</b><div class="sub">${esc(it.desc)}</div><div class="sub" style="margin-top:2px">${wh.length ? esc(wh[0][0]) + (wh.length > 1 ? ` and ${wh.length - 1} more` : "") : ""}</div></span></button>`;
+  }).join("") || `<p class="empty">No item matches.</p>`;
+  $("#iMore").hidden = list.length <= iShown; $("#iMore").textContent = `Show more (${list.length - iShown} left)`;
+}
+$("#iFilter").addEventListener("input", () => renderItems(true));
+$("#iMore").addEventListener("click", () => { iShown += 180; renderItems(); });
+$("#iCats").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  iCat = iCat === b.dataset.cat ? "" : b.dataset.cat;
+  $("#iCats").querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", x.dataset.cat === iCat));
+  renderItems(true);
+});
+
+/* ---------- more ---------- */
+const MORE = [["gifts", "Gifts & legendaries"], ["types", "Type chart"], ["shinies", "Unique shinies"], ["breeding", "Breeding"], ["completion", "Completion"], ["faq", "FAQ"], ["features", "What's new"]];
+let moreTab = store.get("more", "gifts");
+function moreTabs() {
+  const P = D.pages || {};
+  return MORE.filter(([k]) => k === "types" || (k === "gifts" && D.statics && D.statics.length) ||
+    (k === "shinies" && D.shinies && D.shinies.length) || (P[k] && P[k].length));
+}
+function renderMore() {
+  const tabs = moreTabs();
+  if (!tabs.some(([k]) => k === moreTab)) moreTab = tabs[0][0];
+  $("#mTabs").innerHTML = tabs.map(([k, n]) => `<button class="chip" type="button" data-mt="${k}" aria-pressed="${k === moreTab}">${n}</button>`).join("");
+  let h = "";
+  if (moreTab === "gifts") {
+    let g = "";
+    for (const s of D.statics) {
+      if (s.group !== g) { if (g) h += "</div>"; g = s.group; h += `<div class="group-h">${esc(g)}</div><div class="grid">`; }
+      h += `<div class="card" style="display:flex;gap:10px;align-items:flex-start">${spr("mon", s.img, 56)}<div style="min-width:0"><button class="mbtn" type="button" data-mon="${esc(s.mon)}" style="font-weight:700;font-size:16px;background:none;border:0;padding:0">${esc(s.mon)}</button><dl class="kv" style="font-size:13px;margin-top:4px">${s.kv.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div></div>`;
+    }
+    h += "</div>";
+  } else if (moreTab === "types") {
+    h += `<div class="tchart-wrap"><table class="tchart"><thead><tr><th class="r"><span class="label" style="writing-mode:horizontal-tb;transform:none">Attack ↓ Defend →</span></th>${TYPES.map(t => `<th><span class="type" style="background:${tcol(t)}">${esc(t.slice(0, 3))}</span></th>`).join("")}</tr></thead><tbody>`;
+    for (const a of TYPES) h += `<tr><th class="r">${typeChip(a)}</th>${CHART[a].map((v, j) => `<td class="${v === "2" ? "x2" : v === "½" ? "x05" : v === "0" ? "x0" : ""}" title="${esc(a)} → ${esc(TYPES[j])}">${esc(v)}</td>`).join("")}</tr>`;
+    h += `</tbody></table></div><div class="legend"><span class="a">2× super effective</span><span class="b">½ not very effective</span><span class="c">0 no effect</span></div>`;
+  } else if (moreTab === "shinies") {
+    h += `<p class="note">These 25 Pokémon have a second shiny colouring, used when the Alt Shiny option is on (chosen when you start a new game).</p><div class="shinies">`;
+    for (const n of D.shinies) { const k = norm(n).replace(/ /g, ""); const key = Object.keys(A.shiny.index).find(x => x.replace(/_/g, "") === k) || k;
+      h += `<div class="card"><button class="mbtn" type="button" data-mon="${esc(n)}" style="font-weight:700;background:none;border:0;padding:0">${esc(n)}</button><div class="pair"><figure>${spr("shiny", key, 64)}<figcaption>Classic</figcaption></figure><figure>${spr("shiny_alternate", key, 64)}<figcaption>Alternate</figcaption></figure></div></div>`; }
+    h += "</div>";
+  } else if (moreTab === "breeding" || moreTab === "features") {
+    h += `<div class="grid features">${(D.pages[moreTab] || []).filter(c => c.rows && c.rows.length).map(c => `<div class="card"><h3>${esc(c.title)}</h3><ul>${c.rows.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  } else if (moreTab === "completion") {
+    const t = (D.pages.completion || [])[0];
+    h += t ? `<div class="grid">${t.table.map(r => `<div class="card"><span class="label">${esc(r[1])}</span><h3 style="margin-top:4px">${esc(r[2])}</h3></div>`).join("")}</div>` : "";
+  } else if (moreTab === "faq") {
+    const t = (D.pages.faq || [])[0];
+    h += t ? `<input class="filter" id="faqF" type="search" placeholder="Search the FAQ" aria-label="Search the FAQ"><div class="faq" id="faqL">${t.table.map(r => `<details data-s="${esc(norm(r.join(" ")))}"><summary><span class="tag">${esc(r[0])}</span>${esc(r[1])}</summary><p>${esc(r[2])}</p>${r[3] ? `<p style="color:var(--muted)">${esc(r[3])}</p>` : ""}</details>`).join("")}</div>` : "";
+  }
+  $("#mBody").innerHTML = h;
+  const ff = $("#faqF"); if (ff) ff.addEventListener("input", () => { const f = norm(ff.value); document.querySelectorAll("#faqL details").forEach(d => d.hidden = f && !d.dataset.s.includes(f)); });
+}
+$("#mTabs").addEventListener("click", e => { const b = e.target.closest("[data-mt]"); if (!b) return; moreTab = b.dataset.mt; store.set("more", moreTab); renderMore(); });
+
+/* ---------- global search ---------- */
+function renderSearch(q) {
+  const f = norm(q);
+  const sec = (title, items) => items.length ? `<div class="group-h">${title}</div><div class="grid">${items.join("")}</div>` : "";
+  const mons = D.dex.filter(e => norm(e.name).includes(f)).slice(0, 12).map(e => `<button class="row-btn" type="button" data-mon="${esc(e.name)}">${spr("icon", e.icon, 32)}<span class="grow"><b>${esc(e.name)}</b> <span class="types">${e.forms[0].types.map(typeChip).join("")}</span></span></button>`);
+  const mvs = Object.keys(D.moves).filter(n => norm(n).includes(f)).slice(0, 10).map(n => `<button class="row-btn" type="button" data-move="${esc(n)}"><span class="grow"><b>${esc(n)}</b> ${typeChip(D.moves[n].type)}<div class="sub">${esc(D.moves[n].cat)} · Power ${esc(D.moves[n].pow || "—")}</div></span></button>`);
+  const abs = Object.keys(D.abilities).filter(n => norm(n).includes(f)).slice(0, 6).map(n => `<button class="row-btn" type="button" data-ability="${esc(n)}"><span class="grow"><b>${esc(n)}</b><div class="sub">${esc(D.abilities[n])}</div></span></button>`);
+  const its = D.items.filter(i => norm(i.name).includes(f)).slice(0, 10).map(i => `<button class="row-btn" type="button" data-item="${esc(i.name)}">${spr("item", i.icon, 32)}<span class="grow"><b>${esc(i.name)}</b><div class="sub">${esc(i.desc)}</div></span></button>`);
+  const places = D.enc.filter(e => norm(e.loc).includes(f)).slice(0, 8).map(e => `<button class="row-btn" type="button" data-goto-wild="${esc(e.loc)}"><span class="grow"><b>${esc(e.loc)}</b><div class="sub">Wild Pokémon</div></span></button>`);
+  const stops = STOPS.filter(s => norm(s.title).includes(f)).slice(0, 8).map(s => `<button class="row-btn" type="button" data-goto-stop="${esc(s.id)}"><span class="grow"><b>${esc(s.title)}</b><div class="sub">Journey stop ${s.n} · ${esc(s.region)}</div></span></button>`);
+  const trs = D.trainers.map((t, i) => [t, i]).filter(([t]) => norm(trainerLabel(t) + " " + t.role).includes(f)).slice(0, 6).map(([, i]) => trainerRow(i));
+  const all = sec("Pokémon", mons) + sec("Journey", stops) + sec("Battles", trs) + sec("Places", places) + sec("Moves", mvs) + sec("Items", its) + sec("Abilities", abs);
+  $("#v-search").innerHTML = `<div class="view-head"><div><h2>Results for “${esc(q)}”</h2></div><button class="btn ghost" type="button" id="clearQ">Clear search</button></div>` + (all || `<p class="empty">Nothing matches “${esc(q)}”. Try a shorter word.</p>`);
+}
+let qTimer;
+$("#q").addEventListener("input", () => { clearTimeout(qTimer); qTimer = setTimeout(route, 120); });
+document.addEventListener("click", e => {
+  if (e.target.closest("#clearQ")) { $("#q").value = ""; route(); return; }
+  const w = e.target.closest("[data-goto-wild]"); if (w) { $("#q").value = ""; $("#wFilter").value = w.dataset.gotoWild; location.hash = "wild"; route(); return; }
+  const s = e.target.closest("[data-goto-stop]"); if (s) { $("#q").value = ""; location.hash = "journey"; route(); $("#jFilter").value = ""; renderJourney(); const art = document.getElementById("stop-" + s.dataset.gotoStop); toggleStop(art, true); art.scrollIntoView({ block: "start" }); }
+});
+
+/* ---------- routing ---------- */
+const rendered = {};
+function route() {
+  const q = $("#q").value.trim();
+  let tab = (location.hash || "").slice(1);
+  if (!TABS.some(t => t[0] === tab)) tab = "journey";
+  document.querySelectorAll(".view").forEach(v => v.hidden = true);
+  document.querySelectorAll(".tabs a").forEach(a => a.toggleAttribute("aria-current", false));
+  if (q.length >= 2) { renderSearch(q); $("#v-search").hidden = false; return; }
+  document.querySelectorAll(`.tabs a[data-tab="${tab}"]`).forEach(a => a.setAttribute("aria-current", "page"));
+  $("#v-" + tab).hidden = false;
+  const r = { journey: renderJourney, wild: renderWild, trainers: renderTrainers, dex: () => renderDex(true), items: () => renderItems(true), more: renderMore }[tab];
+  if (!rendered[tab] || tab === "wild") { r(); rendered[tab] = true; }
+}
+addEventListener("hashchange", () => { closeAll(); route(); scrollTo(0, 0); });
+
+/* ---------- boot ---------- */
+fetch("data.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(data => {
+  D = data; A = data.atlas; TYPES = data.types; CHART = data.chart;
+  const M = data.meta || {};
+  if (M.key) PREFIX = M.key + ":";
+  if (M.title) {
+    document.title = M.title;
+    $(".brand h1 .long").textContent = M.title;
+    $(".brand h1 .short").textContent = M.short || M.title;
+    $(".brand small").textContent = "Version " + (M.version || data.version || "");
+  }
+  if (M.journeyIntro) $("#v-journey .view-head p").textContent = M.journeyIntro;
+  if (M.journeyNote) $("#v-journey .note").textContent = M.journeyNote;
+  if (M.footer) $("footer.site").textContent = M.footer + " Progress ticks are saved in this browser only.";
+  if (M.trainersIntro) $("#v-trainers .view-head p").textContent = M.trainersIntro;
+  if (M.itemsIntro) $("#v-items .view-head p").textContent = M.itemsIntro;
+  if (M.moreIntro) $("#v-more .view-head p").textContent = M.moreIntro;
+  for (const [id, text] of Object.entries(M.placeholders || {})) { const el = document.getElementById(id); if (el) el.placeholder = text; }
+  for (const e of D.dex) {
+    dexByName.set(norm(e.name), e);
+    e.forms.forEach(f => { if (!dexByName.has(norm(f.name))) dexByName.set(norm(f.name), e); });
+    const f = e.forms[0];
+    e._s = norm([e.name, e.num, ...e.forms.flatMap(x => [x.name, ...(x.types || []), ...(x.ab || []), x.ha || ""]), ...(f.lv || []).map(x => x[1]), ...(f.tm || []), ...(f.tutor || []), ...(f.egg || [])].join(" "));
+  }
+  for (const it of D.items) it._s = norm(it.name + " " + it.desc + " " + it.badges.join(" ") + " " + it.where.map(w => w.join(" ")).join(" "));
+  $("#dTypes").innerHTML = TYPES.map(t => `<button class="chip" type="button" data-type="${esc(t)}" aria-pressed="false"><span class="type" style="background:${tcol(t)}">${esc(t)}</span></button>`).join("");
+  const cats = new Set(D.items.flatMap(i => i.badges));
+  $("#iCats").innerHTML = ICATS.filter(c => cats.has(c)).map(c => `<button class="chip" type="button" data-cat="${esc(c)}" aria-pressed="false">${esc(c === "Items" ? "Other items" : c === "Poke Balls" ? "Poké Balls" : c)}</button>`).join("");
+  buildStops();
+  $("#loading").remove();
+  route();
+}).catch(err => {
+  $("#loading").innerHTML = `<p>The guide's data didn't load (${esc(err.message)}). Reload the page to try again.</p>`;
+});
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>

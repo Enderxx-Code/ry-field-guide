@@ -1,0 +1,28 @@
+{
+ "name": "Recharged Yellow Field Guide",
+ "short_name": "RY Guide",
+ "description": "Unofficial field guide to Pokémon Recharged Yellow 1.9.7.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#1d2347",
+ "theme_color": "#1d2347",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-maskable.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
