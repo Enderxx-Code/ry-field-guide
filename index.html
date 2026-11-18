@@ -175,6 +175,7 @@ main { padding-block: 18px 40px; }
 .row-btn:hover { border-color: var(--silver); }
 .row-btn .grow { flex: 1; min-width: 0; }
 .row-btn .sub { color: var(--muted); font-size: 12.5px; }
+.dexlist .row-btn .types { display: flex; margin-top: 3px; }
 .dexlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
 .dexlist .row-btn { content-visibility: auto; contain-intrinsic-size: auto 58px; }
 .dexnum { font-family: var(--f-display); font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
@@ -288,7 +289,7 @@ footer.site a { color: inherit; }
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><h1><span class="long">Recharged Yellow Field Guide</span><span class="short">RY Guide</span></h1><small>Version 2.0.6</small></div></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><h1><span class="long">Recharged Yellow Field Guide</span><span class="short">RY Guide</span></h1><small data-ver-full>Version</small></div></div>
     <label class="search"><span class="sr" hidden>Search everything</span>
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" type="search" placeholder="Search Pokémon, moves, items, places…" autocomplete="off" aria-label="Search everything">
@@ -303,15 +304,16 @@ footer.site a { color: inherit; }
   <section class="view" id="v-search" hidden></section>
 
   <section class="view" id="v-journey" hidden>
-    <div class="view-head"><div><h2>Journey</h2><p>The walkthrough, stop by stop. Each stop shows the wild Pokémon and big battles there in 2.0.6. Tick stops off as you go.</p></div></div>
+    <div class="view-head"><div><h2>Journey</h2><p>The walkthrough, stop by stop. Each stop shows the wild Pokémon and big battles there<span data-ver-in></span>. Tick stops off as you go.</p></div></div>
     <p class="note">The walkthrough text was written for an earlier version of Heart &amp; Soul. Its directions still hold, but the wild Pokémon, trainer teams and items shown under each stop come from 2.0.6, so trust those where the two disagree.</p>
     <div class="progress"><div><span class="label">Progress</span><div><b id="pDone">0</b> <span id="pOf"></span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="contBtn" type="button">Continue</button></div><div class="bar"><i id="pBar"></i></div></div>
+    <p class="note" id="saveNote" hidden>Your ticks can't be saved in this browser right now (storage is full or blocked), so they'll be gone when you reload.</p>
     <input class="filter" id="jFilter" type="search" placeholder="Find a stop (Goldenrod, Surf, Lugia…)" aria-label="Find a stop">
     <div id="jList"></div>
   </section>
 
   <section class="view" id="v-wild" hidden>
-    <div class="view-head"><div><h2>Wild Pokémon</h2><p>Every place with wild encounters, with rates and levels from 2.0.6. Search a place or a Pokémon.</p></div></div>
+    <div class="view-head"><div><h2>Wild Pokémon</h2><p>Every place with wild encounters, with rates and levels<span data-ver-from></span>. Search a place or a Pokémon.</p></div></div>
     <input class="filter" id="wFilter" type="search" placeholder="Route 34, Ice Path, Larvitar…" aria-label="Filter wild encounters">
     <div id="wList"></div>
   </section>
@@ -356,10 +358,11 @@ footer.site a { color: inherit; }
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let PREFIX = "hns:";   // per guide, so each keeps its own ticks (set from data.meta.key)
-const norm = s => String(s || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/['’.]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+// ♀ and ♂ become their own letters first, so Nidoran♀ and Nidoran♂ don't normalise to the same name.
+const norm = s => String(s || "").replace(/♀/g, " f").replace(/♂/g, " m").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/['’.]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 const store = {
   get(k, d) { try { const v = localStorage.getItem(PREFIX + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); } catch {} }
+  set(k, v) { try { localStorage.setItem(PREFIX + k, JSON.stringify(v)); return true; } catch { return false; } }
 };
 
 const TABS = [
@@ -374,6 +377,7 @@ const tabHtml = TABS.map(([id, n, ic]) => `<a href="#${id}" data-tab="${id}"><sv
 $("#tabsTop").innerHTML = tabHtml; $("#tabsBottom").innerHTML = tabHtml;
 
 let D, A, dexByName = new Map(), dexBySlug = new Map();
+let VER = "";   // the game version the data is for (data.version), shown where the page names it
 
 /* ---------- sprites ---------- */
 function spr(sheet, key, px) {
@@ -441,9 +445,10 @@ function placeKeys(title) {
     part = part.replace(/\([^)]*\)/g, " ");
     let k = norm(part).replace(/\b(revisited|final visit|finished|outside)\b/g, "").trim();
     if (!k) continue;
-    keys.push({ k, q: norm(q) });
+    const part_ = keys.length ? keys[keys.length - 1].part + 1 : 0;
+    keys.push({ k, q: norm(q), part: part_ });
     const k2 = k.replace(/\b(east|west|north|south)$/, "").trim();
-    if (k2 !== k) keys.push({ k: k2, q: k.slice(k2.length).trim() });
+    if (k2 !== k) keys.push({ k: k2, q: k.slice(k2.length).trim(), part: part_ });
   }
   return keys;
 }
@@ -453,18 +458,23 @@ function locMatch(locName, key) {
   return norm(locName).replace(/ /g, "") === key.replace(/ /g, "");
 }
 function encFor(title) {
-  const keys = placeKeys(title), hits = new Set();
-  for (const { k, q } of keys) {
+  // Each place named in the title ("A / B") adds its tables; within one place, the name without its direction
+  // ("Route 30 North" -> "Route 30") is tried only when the full name finds nothing.
+  const keys = placeKeys(title), hits = new Set(), partDone = new Set();
+  for (const { k, q, part } of keys) {
+    if (partDone.has(part)) continue;
     let m = D.enc.filter(e => locMatch(e.loc, k));
     if (q) { const mq = m.filter(e => norm(e.loc).includes(q)); if (mq.length) m = mq; }
     m.forEach(e => hits.add(e));
-    if (m.length) break;
+    if (m.length) partDone.add(part);
   }
   return [...hits];
 }
 function trainersFor(title) {
   const t = title.toLowerCase(), out = [];
   const add = pred => D.trainers.forEach((tr, i) => { if (pred(tr) && !out.includes(i)) out.push(i); });
+  const named = ((D.meta || {}).stopTrainers || {})[title];   // a guide can say which bosses belong to a stop
+  if (named) { named.forEach(n => add(tr => tr.name === n)); return out; }
   for (const [g, name] of Object.entries(GYMS)) if (t.includes(g)) add(tr => tr.name === name && /Leader/.test(tr.role));
   if (/rival battle/.test(t)) add(tr => tr.group === "Rival");
   if (/elite 4/.test(t)) add(tr => tr.group === "Elite Four" || tr.group === "Champion");
@@ -486,8 +496,13 @@ function itemsFor(title) {
   return out;
 }
 
+let DONE = new Set();   // ticked stops: kept here, written through to storage (which can fail)
+function saveDone() {
+  const ok = store.set("done", [...DONE]);
+  const n = $("#saveNote"); if (n) n.hidden = ok;
+}
 function renderJourney() {
-  const done = new Set(store.get("done", []));
+  const done = DONE;
   const f = norm($("#jFilter").value);
   let html = "", region = "";
   for (const s of STOPS) {
@@ -513,7 +528,7 @@ function stopBody(s) {
     h += `</div></div>`;
   }
   if (s.enc.length) {
-    h += `<div class="panel"><span class="label">Wild Pokémon here in 2.0.6</span>`;
+    h += `<div class="panel"><span class="label">Wild Pokémon here${VER ? " in " + esc(VER) : ""}</span>`;
     for (const e of s.enc) h += encBlock(e, true);
     h += `</div>`;
   }
@@ -533,7 +548,7 @@ function toggleStop(art, open) {
   btn.setAttribute("aria-expanded", open);
 }
 function updateProgress() {
-  const done = new Set(store.get("done", []));
+  const done = DONE;
   const n = STOPS.filter(s => done.has(s.id)).length;
   $("#pDone").textContent = n; $("#pOf").textContent = `of ${STOPS.length} stops`;
   $("#pBar").style.width = (100 * n / STOPS.length) + "%";
@@ -544,9 +559,9 @@ function updateProgress() {
 $("#jList").addEventListener("click", e => {
   const art = e.target.closest(".stop"); if (!art) return;
   if (e.target.closest(".check")) {
-    const done = new Set(store.get("done", [])); const id = art.dataset.id;
+    const done = DONE; const id = art.dataset.id;
     done.has(id) ? done.delete(id) : done.add(id);
-    store.set("done", [...done]);
+    saveDone();
     art.classList.toggle("done", done.has(id)); $(".check", art).setAttribute("aria-pressed", done.has(id));
     updateProgress(); return;
   }
@@ -554,7 +569,7 @@ $("#jList").addEventListener("click", e => {
 });
 $("#jFilter").addEventListener("input", renderJourney);
 $("#contBtn").addEventListener("click", () => {
-  const done = new Set(store.get("done", [])); const next = STOPS.find(s => !done.has(s.id)); if (!next) return;
+  const done = DONE; const next = STOPS.find(s => !done.has(s.id)); if (!next) return;
   $("#jFilter").value = ""; renderJourney();
   const art = document.getElementById("stop-" + next.id); toggleStop(art, true);
   art.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
@@ -595,7 +610,10 @@ $("#wFilter").addEventListener("input", renderWild);
 
 /* ---------- trainers ---------- */
 function trainerLabel(tr) {
-  if (tr.group === "Rival") { const b = tr.battles[0]; const s = b && b.party[b.party.length - 1]; return `Rival · with ${s ? s.mon : "?"}`; }
+  if (tr.group === "Rival") {
+    if (tr.name && tr.name !== "Rival") return tr.name;   // a named rival (May, Brendan, Wally): the name says who
+    const b = tr.battles[0]; const s = b && b.party[b.party.length - 1]; return `Rival · with ${s ? s.mon : "?"}`;
+  }
   return tr.name;
 }
 function trainerRow(i) {
@@ -691,13 +709,16 @@ function monSheet(name, formIdx = 0, tab = "lv", replace = false) {
   h += `<div class="sec"><span class="label">Where to find it</span>${where.length ? `<ul class="wherelist">${where.map(([w, how, k]) => `<li><span>${k === "gift" ? '<span class="tag">Gift</span> ' : ""}${esc(w)}</span><span class="h">${esc(how)}</span></li>`).join("")}</ul>` : `<p class="sub" style="color:var(--muted);margin:0">Not found in the wild. Evolve it, breed it or trade for it.</p>`}</div>`;
   if (f.dexText) h += `<div class="sec"><span class="label">Pokédex entry</span><p style="margin:0;max-width:62ch">${esc(f.dexText)}</p></div>`;
   if (f.info) h += `<div class="sec"><span class="label">Details</span><dl class="kv">${Object.entries(f.info).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></div>`;
-  const mt = [["lv", "Level up", f.lv], ["tm", "TM / HM", f.tm], ["tutor", "Tutor", f.tutor], ["egg", "Egg moves", f.egg]].filter(x => x[2] && x[2].length);
+  // A guide with two learnsets (Heart & Soul: Gen 7 by default, Gen 3 for some species) gets a tab for each.
+  const two = (f.lv3 && f.lv3.length) || (f.egg3 && f.egg3.length);
+  const mt = [["lv", two ? "Level up (Gen 7)" : "Level up", f.lv], ["lv3", "Level up (Gen 3)", f.lv3], ["tm", "TM / HM", f.tm],
+    ["tutor", "Tutor", f.tutor], ["egg", two ? "Egg moves (Gen 7)" : "Egg moves", f.egg], ["egg3", "Egg moves (Gen 3)", f.egg3]].filter(x => x[2] && x[2].length);
   if (mt.length) {
     if (!mt.some(x => x[0] === tab)) tab = mt[0][0];
     h += `<div class="tabs2" role="tablist">${mt.map(([k, n]) => `<button type="button" role="tab" data-mtab="${k}" aria-selected="${k === tab}">${n}</button>`).join("")}</div><div id="mvInfo"></div><div style="margin-top:10px">`;
     for (const [k, , list] of mt) {
       h += `<div data-mpanel="${k}"${k === tab ? "" : " hidden"}>`;
-      h += k === "lv" ? `<div class="lvlist">${list.map(([l, m]) => `<span class="l">${esc(l)}</span>${moveLink(m)}`).join("")}</div>` : `<div class="mlist">${list.map(m => `<span>${moveLink(m)}</span>`).join("")}</div>`;
+      h += k === "lv" || k === "lv3" ? `<div class="lvlist">${list.map(([l, m]) => `<span class="l">${esc(l)}</span>${moveLink(m)}`).join("")}</div>` : `<div class="mlist">${list.map(m => `<span>${moveLink(m)}</span>`).join("")}</div>`;
       h += `</div>`;
     }
     h += `</div>`;
@@ -715,7 +736,7 @@ function monSheet(name, formIdx = 0, tab = "lv", replace = false) {
 function moveInfo(name) {
   const m = D.moves[name]; if (!m) return `<div class="mvinfo"><b>${esc(name)}</b></div>`;
   return `<div class="mvinfo"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:16px">${esc(name)}</b>${typeChip(m.type)}<span class="tag">${esc(m.cat)}</span></div>
-    <dl class="kv" style="margin-top:8px"><dt>Power</dt><dd>${esc(m.pow || "—")}</dd><dt>Accuracy</dt><dd>${esc(m.acc || "—")}</dd><dt>PP</dt><dd>${esc(m.pp)}</dd></dl><p style="margin:8px 0 0">${esc(m.desc)}</p></div>`;
+    <dl class="kv" style="margin-top:8px"><dt>Power</dt><dd>${esc(m.pow || "—")}</dd><dt>Accuracy</dt><dd>${esc(m.acc || "—")}</dd><dt>PP</dt><dd>${esc(m.pp)}</dd>${m.priority ? `<dt>Priority</dt><dd>${esc(m.priority)}</dd>` : ""}${m.crit ? `<dt>Crit stage</dt><dd>${esc(m.crit)}</dd>` : ""}${m.tutor ? `<dt>Tutor</dt><dd>${esc(m.tutor)}</dd>` : ""}</dl><p style="margin:8px 0 0">${esc(m.desc)}</p></div>`;
 }
 function abilityInfo(name) { return `<div class="mvinfo"><b>${esc(name)}</b><p style="margin:6px 0 0">${esc(D.abilities[name] || "No description in the docs.")}</p></div>`; }
 function itemSheet(name) {
@@ -730,7 +751,7 @@ let sheetStack = [];
 function openSheet(html, wire, replaceTop) {
   const host = $("#sheetHost");
   if (replaceTop && sheetStack.length) { sheetStack.pop().remove(); }
-  if (!sheetStack.length) host.insertAdjacentHTML("beforeend", '<div class="scrim"></div>');
+  if (!$(".scrim", host)) host.insertAdjacentHTML("beforeend", '<div class="scrim"></div>');   // one, even when a sheet is replaced
   const sh = document.createElement("div");
   sh.className = "sheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
   sh.innerHTML = `<div class="sheet-top"><span class="grab"></span>${sheetStack.length ? '<button class="iconbtn" type="button" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' : ""}<button class="iconbtn" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>` + html;
@@ -744,7 +765,7 @@ function openSheet(html, wire, replaceTop) {
 function closeTop() {
   const sh = sheetStack.pop(); if (sh) sh.remove();
   if (sheetStack.length) sheetStack[sheetStack.length - 1].hidden = false;
-  else { const s = $("#sheetHost .scrim"); if (s) s.remove(); document.body.classList.remove("docked"); }
+  else { document.querySelectorAll("#sheetHost .scrim").forEach(s => s.remove()); document.body.classList.remove("docked"); }
 }
 const dockMQ = matchMedia("(min-width: 840px)");
 function docked() { return dockMQ.matches; }
@@ -791,7 +812,7 @@ $("#iCats").addEventListener("click", e => {
 
 /* ---------- more ---------- */
 const MORE = [["gifts", "Gifts & legendaries"], ["types", "Type chart"], ["shinies", "Unique shinies"], ["breeding", "Breeding"], ["completion", "Completion"], ["faq", "FAQ"], ["features", "What's new"]];
-let moreTab = store.get("more", "gifts");
+let moreTab = "gifts";   // the saved choice is read at boot, after PREFIX is set from data.meta.key
 function moreTabs() {
   const P = D.pages || {};
   return MORE.filter(([k]) => k === "types" || (k === "gifts" && D.statics && D.statics.length) ||
@@ -851,7 +872,17 @@ $("#q").addEventListener("input", () => { clearTimeout(qTimer); qTimer = setTime
 document.addEventListener("click", e => {
   if (e.target.closest("#clearQ")) { $("#q").value = ""; route(); return; }
   const w = e.target.closest("[data-goto-wild]"); if (w) { $("#q").value = ""; $("#wFilter").value = w.dataset.gotoWild; location.hash = "wild"; route(); return; }
-  const s = e.target.closest("[data-goto-stop]"); if (s) { $("#q").value = ""; location.hash = "journey"; route(); $("#jFilter").value = ""; renderJourney(); const art = document.getElementById("stop-" + s.dataset.gotoStop); toggleStop(art, true); art.scrollIntoView({ block: "start" }); }
+  const s = e.target.closest("[data-goto-stop]"); if (s) {
+    $("#q").value = "";
+    if (location.hash !== "#journey") { keepScroll = true; location.hash = "journey"; }   // its hashchange mustn't scroll back up
+    route(); $("#jFilter").value = ""; renderJourney();
+    const art = document.getElementById("stop-" + s.dataset.gotoStop); toggleStop(art, true); art.scrollIntoView({ block: "start" });
+  }
+  const tab = e.target.closest(".tabs a[data-tab]");
+  if (tab && $("#q").value) {   // a tab tapped while searching shows that tab: the search is cleared
+    $("#q").value = "";
+    if (location.hash.slice(1) === tab.dataset.tab) route();
+  }
 });
 
 /* ---------- routing ---------- */
@@ -868,23 +899,29 @@ function route() {
   const r = { journey: renderJourney, wild: renderWild, trainers: renderTrainers, dex: () => renderDex(true), items: () => renderItems(true), more: renderMore }[tab];
   if (!rendered[tab] || tab === "wild") { r(); rendered[tab] = true; }
 }
-addEventListener("hashchange", () => { closeAll(); route(); scrollTo(0, 0); });
+let keepScroll = false;
+addEventListener("hashchange", () => { closeAll(); route(); if (keepScroll) keepScroll = false; else scrollTo(0, 0); });
 
 /* ---------- boot ---------- */
 fetch("data.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(data => {
   D = data; A = data.atlas; TYPES = data.types; CHART = data.chart;
   const M = data.meta || {};
   if (M.key) PREFIX = M.key + ":";
+  moreTab = store.get("more", "gifts");
+  DONE = new Set(store.get("done", []));
+  VER = String(data.version || M.version || "");
+  $("[data-ver-full]").textContent = "Version " + (M.version || VER);
+  if (VER) { $("[data-ver-in]").textContent = " in " + VER; $("[data-ver-from]").textContent = " from " + VER; }
   if (M.title) {
     document.title = M.title;
     $(".brand h1 .long").textContent = M.title;
     $(".brand h1 .short").textContent = M.short || M.title;
-    $(".brand small").textContent = "Version " + (M.version || data.version || "");
   }
   if (M.journeyIntro) $("#v-journey .view-head p").textContent = M.journeyIntro;
   if (M.journeyNote) $("#v-journey .note").textContent = M.journeyNote;
   if (M.footer) $("footer.site").textContent = M.footer + " Progress ticks are saved in this browser only.";
   if (M.trainersIntro) $("#v-trainers .view-head p").textContent = M.trainersIntro;
+  if (M.wildIntro) $("#v-wild .view-head p").textContent = M.wildIntro;
   if (M.itemsIntro) $("#v-items .view-head p").textContent = M.itemsIntro;
   if (M.moreIntro) $("#v-more .view-head p").textContent = M.moreIntro;
   for (const [id, text] of Object.entries(M.placeholders || {})) { const el = document.getElementById(id); if (el) el.placeholder = text; }
